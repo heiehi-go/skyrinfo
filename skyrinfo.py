@@ -333,12 +333,16 @@ def cal_r(obj:df.Field,filter_sign=False):
     返回:
     - R: float，计算得到的半径。
     """
+    # 计算中心
+    x,y=outline(obj)
+    x_center,y_center = x.mean(),y.mean()
+    x = x-x_center
+    y = y-y_center    
     # 是否使用傅里叶滤波器
     if filter_sign:
-        x,y=outline(obj)
         _,r = outline_filter(x,y,CPsign=1)
     else:
-        _,r=outline(obj,CPsign=1)
+        _,r = cartesian2polar(x,y)
     
     # 最终计算半径
     if len(r)==0:
