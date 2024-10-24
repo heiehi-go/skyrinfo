@@ -263,7 +263,7 @@ def outline_filter(x,y,CPsign=0):
         v1,v2 = theta,r
     return v1,v2
     
-def cal_center(obj:df.Field):
+def cal_center(obj):
     """
     计算给定对象的中心坐标。
 
@@ -273,7 +273,11 @@ def cal_center(obj:df.Field):
     返回值:
     x_center, y_center: 对象的中心点坐标。
     """
-    x,y = outline(obj)
+    
+    if isinstance(obj,df.Field):
+        x,y = outline(obj)
+    elif isinstance(obj,tuple):
+        x,y = obj
     x_center,y_center = x.mean(),y.mean()
     
     return x_center,y_center
@@ -320,7 +324,7 @@ def outline_sorted(obj:df.Field):
     return x_sorted, y_sorted
 
 
-def cal_r(obj:df.Field,filter_sign=False):
+def cal_r(obj,filter_sign=False):
     """
     计算斯格明子半径 r。
 
@@ -333,13 +337,19 @@ def cal_r(obj:df.Field,filter_sign=False):
     返回:
     - R: float，计算得到的半径。
     """
+    if isinstance(obj,df.Field):
+        x,y=outline(obj)
+    elif isinstance(obj,tuple):
+        x,y = obj        
+
     # 计算中心
-    x,y=outline(obj)
-    x_center,y_center = x.mean(),y.mean()
+    x_center,y_center = cal_center((x,y))
+    # 减去中心
     x = x-x_center
-    y = y-y_center    
-    # 是否使用傅里叶滤波器
-    if filter_sign:
+    y = y-y_center
+    # 转换为极坐标
+    
+    if filter_sign: # 是否使用傅里叶滤波器
         _,r = outline_filter(x,y,CPsign=1)
     else:
         _,r = cartesian2polar(x,y)
